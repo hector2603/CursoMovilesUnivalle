@@ -31,7 +31,7 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = starDestination){
                     composable("login"){Login(Modifier, LoginViewModel(), navController ) }
                     composable("sign-up"){SignUp(Modifier, SignUpViewModel(), navController ) }
-                    composable("home"){Home()}
+                    composable("home"){Home(navController)}
                 }
             }
         }
