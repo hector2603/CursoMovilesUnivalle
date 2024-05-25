@@ -1,6 +1,5 @@
-package com.example.arquitecturamvvm.signup
+package com.example.arquitecturamvvm.login
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,14 +24,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.lifecycle.Observer
 import androidx.navigation.NavHostController
 import com.example.arquitecturamvvm.R
 import com.example.arquitecturamvvm.ui.theme.Purple80
@@ -40,25 +37,17 @@ import com.example.arquitecturamvvm.ui.theme.Typography
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun SignUp(
+fun Login(
     modifier: Modifier = Modifier,
-    signUpViewModel: SignUpViewModel,
+    loginViewModel: LoginViewModel,
     navController: NavHostController,
 ) {
 
-    val user:String by signUpViewModel.user.observeAsState(initial = "")
-    val password:String by signUpViewModel.password.observeAsState(initial = "")
-    val name:String by signUpViewModel.name.observeAsState(initial = "")
-    val isButtonEnable:Boolean by signUpViewModel.isButtonEnable.observeAsState(initial = false)
+    val user:String by loginViewModel.user.observeAsState(initial = "")
+    val password:String by loginViewModel.password.observeAsState(initial = "")
+    val isLoginEnable:Boolean by loginViewModel.isLoginEnable.observeAsState(initial = false)
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     val context = LocalContext.current
-
-    val lifecycleOwner = LocalLifecycleOwner.current
-    signUpViewModel.allUsers.observe(lifecycleOwner, Observer { users ->
-            users.forEach { user ->
-                Log.d("SignUpView", "User: $user")
-            }
-    })
 
     Surface(
         modifier = Modifier
@@ -73,7 +62,7 @@ fun SignUp(
                 )
         ) {
             ConstraintLayout(modifier = modifier.fillMaxSize()) {
-                val (logo, title, userField, passwordField, nameField, button, buttonLogin) = createRefs()
+                val (logo, title, userField, passwordField, button, buttonCrearCuenta) = createRefs()
 
                 Image(painter = painterResource(id = R.drawable.logo),
                     contentDescription = "Logo image",
@@ -93,8 +82,8 @@ fun SignUp(
 
                 TextField(
                     value = user,
-                    onValueChange = { userText -> signUpViewModel.onRegisterChanged(userText, password,name) },
-                    label = { Text("user") },
+                    onValueChange = { userText -> loginViewModel.onLoginChanged(userText, password) },
+                    label = { Text("Login") },
                     singleLine = true,
                     modifier = Modifier
                         .constrainAs(userField) {
@@ -112,33 +101,13 @@ fun SignUp(
                 )
 
                 TextField(
-                    value = name,
-                    onValueChange = { nameText -> signUpViewModel.onRegisterChanged(user, password, nameText) },
-                    label = { Text("name") },
-                    singleLine = true,
-                    modifier = Modifier
-                        .constrainAs(nameField) {
-                            top.linkTo(userField.bottom, margin = 19.dp)
-                            centerHorizontallyTo(parent)
-                        }
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_person_24),
-                            contentDescription = null
-                        )
-                    },
-                )
-
-                TextField(
                     value = password,
-                    onValueChange = { passwordText -> signUpViewModel.onRegisterChanged(user, passwordText,name) },
+                    onValueChange = { passwordText -> loginViewModel.onLoginChanged(user, passwordText) },
                     singleLine = true,
                     label = { Text("Password") },
                     modifier = Modifier
                         .constrainAs(passwordField) {
-                            top.linkTo(nameField.bottom, margin = 19.dp)
+                            top.linkTo(userField.bottom, margin = 19.dp)
                             centerHorizontallyTo(parent)
                         }
                         .fillMaxWidth()
@@ -164,24 +133,24 @@ fun SignUp(
                     })
 
                 Button(onClick = {
-                        signUpViewModel.signUpUser{ navController.navigate("home") }
-                    },
-                    modifier = Modifier.constrainAs(button) {
-                        top.linkTo(passwordField.bottom, margin = 35.dp)
-                        centerHorizontallyTo(parent)
-                    },
-                    enabled = isButtonEnable) {
-                    Text("Crear Cuenta")
+                    loginViewModel.login { navController.navigate("home") }
+                },
+                modifier = Modifier.constrainAs(button) {
+                    top.linkTo(passwordField.bottom, margin = 35.dp)
+                    centerHorizontallyTo(parent)
+                },
+                    enabled = isLoginEnable) {
+                    Text("Acceder")
                 }
 
                 TextButton(onClick = {
-                    navController.navigate("login")
-                },
-                    modifier = Modifier.constrainAs(buttonLogin) {
+                    navController.navigate("sign-up")
+                    },
+                    modifier = Modifier.constrainAs(buttonCrearCuenta) {
                         top.linkTo(button.bottom, margin = 10.dp)
                         centerHorizontallyTo(parent)
                     }) {
-                    Text("Volver")
+                    Text("Crear Cuenta")
                 }
             }
         }
