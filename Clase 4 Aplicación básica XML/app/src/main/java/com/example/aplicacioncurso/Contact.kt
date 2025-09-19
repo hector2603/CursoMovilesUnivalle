@@ -1,0 +1,1 @@
+data class Contact(val nombre: String, val telefono: String)
